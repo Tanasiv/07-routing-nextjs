@@ -1,13 +1,22 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { fetchNotes } from "@/lib/api";
+import styles from "./SearchBox.module.css";
 
-export default function NotesClient({ tag }: { tag: string }) {
-  const { data } = useQuery({
-    queryKey: ["notes", tag],
-    queryFn: () => fetchNotes(1, "", tag),
-  });
+interface SearchBoxProps {
+  value: string;
+  onChange: (value: string) => void;
+}
 
-  return <div>{/* render notes */}</div>;
+export default function SearchBox({ value, onChange }: SearchBoxProps) {
+  return (
+    <div className={styles.wrapper}>
+      <input
+        className={styles.input}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Search notes..."
+      />
+    </div>
+  );
 }
