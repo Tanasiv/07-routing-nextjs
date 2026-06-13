@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNoteById } from "../../../lib/api";
@@ -10,6 +11,19 @@ export default function NoteDetailsClient() {
   const params = useParams();
   const id = params?.id as string;
 
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const {
     data: note,
     isLoading,
@@ -18,24 +32,19 @@ export default function NoteDetailsClient() {
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
     refetchOnMount: false,
+    enabled: !!id,
   });
 
-  if (isLoading) return <p>Loading, please wait...</p>;
-
-  if (isError || !note) return <p>Something went wrong.</p>;
+  if (isLoading) return <p>Loading...</p>;
+  if (isError || !note) return <p>Error</p>;
 
   return (
     <main className={css.main}>
       <div className={css.container}>
-        <div className={css.item}>
-          <div className={css.header}>
-            <h2>{note.title}</h2>
-          </div>
-
-          <p className={css.tag}>{note.tag}</p>
-          <p className={css.content}>{note.content}</p>
-          <p className={css.date}>{note.createdAt}</p>
-        </div>
+        <h2>{note.title}</h2>
+        <p>{note.tag}</p>
+        <p>{note.content}</p>
+        <p>{note.createdAt}</p>
       </div>
     </main>
   );
