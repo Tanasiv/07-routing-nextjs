@@ -1,3 +1,4 @@
-h1 {
-    display: flex;
+.title {
+  font-size: 40px;
+  font-weight: bold;
 }
