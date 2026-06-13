@@ -1,22 +1,33 @@
 "use client";
 
-import styles from "./SearchBox.module.css";
+import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { fetchNoteById } from "@/lib/api";
 
-interface SearchBoxProps {
-  value: string;
-  onChange: (value: string) => void;
-}
+import css from "./Notes.module.css";
 
-export default function SearchBox({ value, onChange }: SearchBoxProps) {
+export default function NoteDetailsClient() {
+  const params = useParams();
+  const id = params?.id as string;
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["note", id],
+    queryFn: () => fetchNoteById(id),
+    refetchOnMount: false,
+    enabled: !!id,
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+  if (isError || !data) return <p>Error</p>;
+
   return (
-    <div className={styles.wrapper}>
-      <input
-        className={styles.input}
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="Search notes..."
-      />
-    </div>
+    <main className={css.main}>
+      <div className={css.container}>
+        <h2>{data.title}</h2>
+        <p>{data.tag}</p>
+        <p>{data.content}</p>
+        <p>{data.createdAt}</p>
+      </div>
+    </main>
   );
 }
